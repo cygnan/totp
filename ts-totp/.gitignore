@@ -1,0 +1,9 @@
+/.*
+/misc/
+!/.gitignore
+
+*.js
+!/dist/totp.js
+!/gulpfile.js
+
+/node_modules/
