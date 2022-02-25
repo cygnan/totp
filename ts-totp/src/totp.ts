@@ -10,34 +10,35 @@
     //     return [].concat(...this);
     // };
 
-    const b32 = (s: string) => {
-        let arr: number[] = [];
+    const decodeBase32 = (s: string): Int8Array => {
+        let secretDecodedNotCut: number[] = [];
         for (let i = 0; i < 8; i++) {
-            let value5Bits: number[] = [];
+            let values5Bit: number[] = [];
             for (let j = 0; j < 8; j++) {
-                let value_base32 = s.charCodeAt(i * 8 + j);
-                let value5Bit: number = value_base32 < 65 ? value_base32 - 24 : value_base32 - 65;
-                value5Bits.push(value5Bit);
+                let valueBase32 = s.charCodeAt(i * 8 + j);
+                let value5Bit: number = valueBase32 < 65 ? valueBase32 - 24 : valueBase32 - 65;
+                values5Bit.push(value5Bit);
             }
-            let value8Bit = [(value5Bits[0] << 3) + (value5Bits[1] >> 2),
-                (value5Bits[1] << 6) + (value5Bits[2] << 1) + (value5Bits[3] >> 4),
-                (value5Bits[3] << 4) + (value5Bits[4] >> 1),
-                (value5Bits[4] << 7) + (value5Bits[5] << 2) + (value5Bits[6] >> 3),
-                (value5Bits[6] << 5) + (value5Bits[7] >> 0)
+            let values8Bit = [(values5Bit[0] << 3) | (values5Bit[1] >> 2),
+                (values5Bit[1] << 6) | (values5Bit[2] << 1) | (values5Bit[3] >> 4),
+                (values5Bit[3] << 4) | (values5Bit[4] >> 1),
+                (values5Bit[4] << 7) | (values5Bit[5] << 2) | (values5Bit[6] >> 3),
+                (values5Bit[6] << 5) | (values5Bit[7] >> 0)
             ];
-            arr.push(...value8Bit);
+            secretDecodedNotCut.push(...values8Bit);
         }
-        return arr;
+        return new Int8Array(secretDecodedNotCut);
     }
 
     const trunc = (dv: DataView) => dv.getUint32(dv.getInt8(19) & 0x0f) & 0x7fffffff;
-    const c = Math.floor(Date.now() / 1000 / 30);
+    const counter = Math.floor(Date.now() / 1000 / 30);
 
-    crypto.subtle.importKey('raw', new Int8Array(b32(secret)), {
+    const secretDecoded = decodeBase32(secret);
+    crypto.subtle.importKey('raw', secretDecoded, {
         name: 'HMAC',
         hash: {name: 'SHA-1'}
     }, true, ['sign'])
-        .then(k => crypto.subtle.sign('HMAC', k, new Int8Array([0, 0, 0, 0, c >> 24, c >> 16, c >> 8, c])))
+        .then(k => crypto.subtle.sign('HMAC', k, new Int8Array([0, 0, 0, 0, counter >> 24, counter >> 16, counter >> 8, counter])))
         // .then(h => document.querySelector('#mfacode').value = ('0' + trunc(new DataView(h))).slice(-6))
         .then(h => {
             run(('0' + trunc(new DataView(h))).slice(-6));
