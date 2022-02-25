@@ -15,7 +15,7 @@
         for (let i = 0; i < 8; i++) {
             let values5Bit: number[] = [];
             for (let j = 0; j < 8; j++) {
-                const valueBase32 = s.charCodeAt(i * 8 + j);
+                const valueBase32: number = s.charCodeAt(i * 8 + j);
                 const value5Bit: number = valueBase32 < 65 ? valueBase32 - 24 : valueBase32 - 65;
                 values5Bit.push(value5Bit);
             }
