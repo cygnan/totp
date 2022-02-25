@@ -3,7 +3,7 @@
 !/.gitignore
 
 *.js
-!/dist/totp.js
+!/dist/totp.bookmarklet.min.js
 !/gulpfile.js
 
 /node_modules/
