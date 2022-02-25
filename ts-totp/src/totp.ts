@@ -1,14 +1,6 @@
-// interface Array<T> {
-//     flat(this: number[][]): number[];
-// }
-
 (() => {
     // const secret: string = 'XXXXXXXXXXXXXXXX';
     const secret: string = 'JBSWY3DPEHPK3PXP';
-
-    // Array.prototype.flat = function () {
-    //     return [].concat(...this);
-    // };
 
     const decodeBase32 = (s: string): Int8Array => {
         let secretDecodedNotCut: number[] = [];
@@ -49,7 +41,6 @@
             e.value = otp;
         } else {
             prompt('One-Time Password', otp);
-            // console.log(otp);
         }
     };
 })();
