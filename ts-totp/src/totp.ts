@@ -15,11 +15,11 @@
         for (let i = 0; i < 8; i++) {
             let values5Bit: number[] = [];
             for (let j = 0; j < 8; j++) {
-                let valueBase32 = s.charCodeAt(i * 8 + j);
-                let value5Bit: number = valueBase32 < 65 ? valueBase32 - 24 : valueBase32 - 65;
+                const valueBase32 = s.charCodeAt(i * 8 + j);
+                const value5Bit: number = valueBase32 < 65 ? valueBase32 - 24 : valueBase32 - 65;
                 values5Bit.push(value5Bit);
             }
-            let values8Bit = [(values5Bit[0] << 3) | (values5Bit[1] >> 2),
+            const values8Bit = [(values5Bit[0] << 3) | (values5Bit[1] >> 2),
                 (values5Bit[1] << 6) | (values5Bit[2] << 1) | (values5Bit[3] >> 4),
                 (values5Bit[3] << 4) | (values5Bit[4] >> 1),
                 (values5Bit[4] << 7) | (values5Bit[5] << 2) | (values5Bit[6] >> 3),
@@ -30,7 +30,7 @@
         return new Int8Array(secretDecodedNotCut);
     }
 
-    const trunc = (dv: DataView) => dv.getUint32(dv.getInt8(19) & 0x0f) & 0x7fffffff;
+    const truncate = (dv: DataView) => dv.getUint32(dv.getInt8(19) & 0x0f) & 0x7fffffff;
     const counter = Math.floor(Date.now() / 1000 / 30);
 
     const secretDecoded = decodeBase32(secret);
@@ -39,9 +39,8 @@
         hash: {name: 'SHA-1'}
     }, true, ['sign'])
         .then(k => crypto.subtle.sign('HMAC', k, new Int8Array([0, 0, 0, 0, counter >> 24, counter >> 16, counter >> 8, counter])))
-        // .then(h => document.querySelector('#mfacode').value = ('0' + trunc(new DataView(h))).slice(-6))
         .then(h => {
-            run(('0' + trunc(new DataView(h))).slice(-6));
+            run(('00000' + truncate(new DataView(h))).slice(-6));
         });
 
     const run = (otp: string) => {
