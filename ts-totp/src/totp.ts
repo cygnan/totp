@@ -1,26 +1,38 @@
-interface Array<T> {
-    flat(this: number[][]): number[];
-}
+// interface Array<T> {
+//     flat(this: number[][]): number[];
+// }
 
 (() => {
-    const secret: string = 'XXXXXXXXXXXXXXXX';
+    // const secret: string = 'XXXXXXXXXXXXXXXX';
+    const secret: string = 'JBSWY3DPEHPK3PXP';
 
-    Array.prototype.flat = function () {
-        return [].concat(...this);
-    };
+    // Array.prototype.flat = function () {
+    //     return [].concat(...this);
+    // };
 
-    const b32 = (s: string) =>
-            [0, 8, 16, 24, 32, 40, 48, 56]
-            .map(i => [0, 1, 2, 3, 4, 5, 6, 7]
-                .map(j => s.charCodeAt(i + j)).map(c => c < 65 ? c - 24 : c - 65))
-            .map(a => [(a[0] << 3) + (a[1] >> 2),
-                (a[1] << 6) + (a[2] << 1) + (a[3] >> 4),
-                (a[3] << 4) + (a[4] >> 1),
-                (a[4] << 7) + (a[5] << 2) + (a[6] >> 3),
-                (a[6] << 5) + (a[7] >> 0),
-            ]).flat(),
-        trunc = (dv: DataView) => dv.getUint32(dv.getInt8(19) & 0x0f) & 0x7fffffff,
-        c = Math.floor(Date.now() / 1000 / 30);
+    const b32 = (s: string) => {
+        let arr: number[] = [];
+        for (let i = 0; i < 8; i++) {
+            let value5Bits: number[] = [];
+            for (let j = 0; j < 8; j++) {
+                let value_base32 = s.charCodeAt(i * 8 + j);
+                let value5Bit: number = value_base32 < 65 ? value_base32 - 24 : value_base32 - 65;
+                value5Bits.push(value5Bit);
+            }
+            let value8Bit = [(value5Bits[0] << 3) + (value5Bits[1] >> 2),
+                (value5Bits[1] << 6) + (value5Bits[2] << 1) + (value5Bits[3] >> 4),
+                (value5Bits[3] << 4) + (value5Bits[4] >> 1),
+                (value5Bits[4] << 7) + (value5Bits[5] << 2) + (value5Bits[6] >> 3),
+                (value5Bits[6] << 5) + (value5Bits[7] >> 0)
+            ];
+            arr.push(...value8Bit);
+        }
+        return arr;
+    }
+
+    const trunc = (dv: DataView) => dv.getUint32(dv.getInt8(19) & 0x0f) & 0x7fffffff;
+    const c = Math.floor(Date.now() / 1000 / 30);
+
     crypto.subtle.importKey('raw', new Int8Array(b32(secret)), {
         name: 'HMAC',
         hash: {name: 'SHA-1'}
